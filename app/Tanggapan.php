@@ -6,13 +6,18 @@ use Illuminate\Database\Eloquent\Model;
 
 class Tanggapan extends Model
 {
-    public $timestamps = false;
     protected $table = 'tanggapans';
+    public $primaryKey = 'id_tanggapan';
     protected $fillable = ['id_pengaduan','tgl_tanggapan','tanggapan',
     'nik'];
 
-    public function pengaduan()
+    public function pengaduan ()
     {
-        return $this->belongsTo(Pengaduan::class);
+        return $this->belongsTo('App\Pengaduan','id_pengaduan');
+    }
+
+    public function user ()
+    {
+        return $this->hasMany('App\User','id');
     }
 }

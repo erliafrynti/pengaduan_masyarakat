@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Pengaduan;
+use App\Tanggapan;
 use Illuminate\Http\Request;
 
 class PengaduanController extends Controller
@@ -12,20 +13,41 @@ class PengaduanController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
+    public function pengaduantanggapan($id_pengaduan)
+    {
+        $pengaduan = Pengaduan::findOrFail($id_pengaduan);
+        $tanggapan = Tanggapan::where('id_pengaduan', $id_pengaduan)->first();
+        return view('pengaduantanggapan', compact('pengaduan','tanggapan'));
+    }
+
     public function index()
     {
+        $tanggapan = Tanggapan::all();
         $pengaduan = Pengaduan::all();
-	    return view('pengaduan.index', compact('pengaduan'));
+    	return view('pengaduan.index', compact('pengaduan','tanggapan'));
+    }
+
+    public function laporan()
+    {
+        $pengaduan = Pengaduan::where('nik', auth()->user()->nik)->get();
+        // dd($pengaduan);
+        // $data = Pengaduan::all();
+        // return auth()->user()->nik;
+        return view('laporan',compact('pengaduan'));
     }
 
     /**
+     * 
      * Show the form for creating a new resource.
      *
      * @return \Illuminate\Http\Response
      */
+
     public function create()
     {
-        return view('pengaduan.create');
+        $pengaduan = Pengaduan::all();
+        return view('pengaduan.create', compact('pengaduan'));
     }
 
     /**
@@ -34,27 +56,33 @@ class PengaduanController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
+
     public function store(Request $request)
     {
+        $message = ([
+            'required' => "Data tidak boleh kosong!",
+        ]);
+
         $this->validate($request,[
             'tgl_pengaduan' => 'required',
-            'nik' => 'required',
     		'isi_laporan' => 'required',
             'foto' => 'required',
-            'status' => 'required'
-
+            
     	]);
+        
+        $imgName = $request->foto->getClientOriginalName() . '-' . time() . '-' . $request->foto->extension();
+        $request->foto->move(public_path('img'),$imgName);
 
         Pengaduan::create([
     		'tgl_pengaduan' => $request->tgl_pengaduan,
-            'nik' => $request->nik,
+            'nik' => auth()->user()->nik,
             'isi_laporan' => $request->isi_laporan,
-            'foto' => $request->foto,
-            'status' => $request->status
+            'foto' => $imgName,
+            'status' => 'Pending'
 
     	]);
 
-    	return redirect('/pengaduan');
+    	return redirect('/pengaduan/create')->with('Toast_Success', 'Data Berhasil Disimpan!');;
     }
 
     /**
@@ -63,9 +91,12 @@ class PengaduanController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($id_pengaduan)
     {
-        //
+        $pengaduan = Pengaduan::with(['pengaduan'])->findOrFail($id_pengaduan);
+        $tanggapan = Tanggapan::where('id_pengaduan', $id_pengaduan)->first();
+    
+        return view('pengaduan.show',compact('pengaduan','tanggapan'));
     }
 
     /**
@@ -92,9 +123,8 @@ class PengaduanController extends Controller
         $this->validate($request,[
             'tgl_pengaduan' => 'required',
             'nik' => 'required',
-    		'isi_laporan' => 'required',
-            'foto' => 'required',
-            'status'=> 'required'
+            'isi_laporan' => 'required',
+            'foto' => 'required'
          ]);
 
          $pengaduan = Pengaduan::find($id_pengaduan);
@@ -102,10 +132,9 @@ class PengaduanController extends Controller
          $pengaduan->nik = $request->nik;
          $pengaduan->isi_laporan = $request->isi_laporan;
          $pengaduan->foto = $request->foto;
-         $pengaduan->status = $request->status;
          $pengaduan->save();
 
-         return redirect('pengaduan');
+         return redirect('/pengaduan');
     }
 
     /**
@@ -116,7 +145,15 @@ class PengaduanController extends Controller
      */
     public function delete($id_pengaduan)
     {
-        Pengaduan::where('id_pengaduan',$id_pengaduan)->delete();
-        return redirect('pengaduan');
+        $pengaduan = Pengaduan::find($id_pengaduan);
+        $pengaduan->delete();
+
+        return redirect('/pengaduan')->with('Toast_Success', 'Data Berhasil, Data Berhasil dIHAPUS!');
+    }
+
+    public function cetak()
+    {
+        $pengaduan = Pengaduan::all();
+        return view('cetak', compact('pengaduan'));
     }
 }

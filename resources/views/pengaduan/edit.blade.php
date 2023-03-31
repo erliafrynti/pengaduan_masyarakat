@@ -10,7 +10,6 @@
         <div class="container">
             <div class="card mt-5">
                 <div class="card-body">
-                    <a href="/pengaduan" class="btn btn-primary">Kembali</a>
                     <br/>
                     <br/>
                     <form method="post" action="/pengaduan/update/{{ $pengaduan->id_pengaduan }}">
@@ -19,7 +18,6 @@
                         {{ method_field('PUT') }}
 
                         <div class="form-group">
-                            <label>Tanggal Pengaduan</label>
                             <input type="date" name="tgl_pengaduan" class="form-control"value="{{ $pengaduan->tgl_pengaduan }}">
 
                             @if($errors->has('tgl_pengaduan'))
@@ -27,11 +25,9 @@
                                     {{ $errors->first('tgl_pengaduan')}}
                                 </div>
                             @endif
-
                         </div>
 
                         <div class="form-group">
-                            <label>NIK</label>
                             <input type="number" name="nik" class="form-control" placeholder="" value="{{ $pengaduan->nik }}">
 
                             @if($errors->has('nik'))
@@ -39,11 +35,9 @@
                                     {{ $errors->first('nik')}}
                                 </div>
                             @endif
-
                         </div>
 
                         <div class="form-group">
-                            <label>Isi Laporan</label>
                             <textarea name="isi_laporan" class="form-control" placeholder="">{{ $pengaduan->isi_laporan }}</textarea>
 
                              @if($errors->has('isi_laporan'))
@@ -55,16 +49,13 @@
                         </div>
 
                         <div class="form-group">
-                            <label>foto</label>
-                            <input type="file" name="foto" class="form-control" placeholder="">
-
-                            @if($errors->has('foto'))
-                                <div class="text-danger">
-                                    {{ $errors->first('foto')}}
-                                </div>
-                            @endif
-
-                        </div>
+                        <input type="file" name="foto" class="form-control" placeholder=""></input>
+                         @if($errors->has('foto'))
+                            <div class="text-danger">
+                                {{ $errors->first('foto')}}
+                            </div>
+                        @endif
+                    </div>
 
                         <div class="form-group">
                             <strong>Status</strong>
@@ -81,6 +72,7 @@
                         </div>
 
                         <div class="form-group">
+                            <a href="/pengaduan" class="btn btn-primary">Kembali</a>
                             <input type="submit" class="btn btn-success" value="Simpan">
                         </div>
 

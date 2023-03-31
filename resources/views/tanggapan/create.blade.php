@@ -1,39 +1,25 @@
-<!doctype html>
-<html>
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" rel="stylesheet">
-        <title>Tanggapan Masyarakat</title>
-    </head>
-    <body>
+@extends('template')
+@section('content')
         <div class="container">
             <div class="card mt-5">
                 <div class="card-header text-center">
+                    <br>
                     <strong>TAMBAH TANGGAPAN</strong>
                 </div>
                 <div class="card-body">
-                    <a href="/tanggapan" class="btn btn-primary">Kembali</a>
                     <br/>
-                    <br/>
-
                     <form method="post" action="/tanggapan/store">
 
                         {{ csrf_field() }}
 
-
-                        <div class="form-group row">
-                            <label class="control-label col-sm-2">Pengaduan</label>
-                            <div class="col-sm-10">
-                                <select class="col-sm-12 form-control" name="id_pengaduan"
-                                    id="pengaduan-dropdown">
-                                    <option value="0" aria-readonly="true"
-                                        >-- Select Pengaduan --
-                                    </option>
-                                    @foreach ($pengaduan as $key => $val)
-
-                                        <option value="<?= $val['id_pengaduan'] ?>">
-                                            {{ $val['isi_laporan'] }}</option>
+                        <div class="form-group">
+                            <label class="col-lg-4 col-form-label" for="val-tanggal_kerusakan">Pengaduan  </label>
+                            <div class="col-lg-6">
+                                <select name="id_pengaduan" id="" class="form-control">
+                                    <option value="">-- Pilih Pengaduan --</option>
+                                    <!-- Barang -->
+                                    @foreach($pengaduan as $pengaduan)
+                                        <option value="{{ $pengaduan->id_pengaduan }}">{{ $pengaduan->isi_laporan }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -73,6 +59,7 @@
                         </div>
 
                         <div class="form-group">
+                            <a href="/tanggapan" class="btn btn-primary">Kembali</a>
                             <input type="submit" class="btn btn-success" value="Simpan">
                         </div>
 
@@ -81,5 +68,4 @@
                 </div>
             </div>
         </div>
-    </body>
-</html>
+@endsection

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Pengaduan;
 use App\Tanggapan;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class TanggapanController extends Controller
@@ -15,8 +16,8 @@ class TanggapanController extends Controller
      */
     public function index()
     {
-        $tanggapan = Tanggapan::all();
         $pengaduan = Pengaduan::all();
+        $tanggapan = Tanggapan::all();
         return view('tanggapan.index',compact('tanggapan','pengaduan'));
     }
 
@@ -27,11 +28,9 @@ class TanggapanController extends Controller
      */
     public function create()
     {
-        $tanggapan = \App\Tanggapan::all();
-
-        $pengaduan = Pengaduan::all();
-
-        return view('tanggapan.create',compact('tanggapan','pengaduan'));
+        $pengaduan = Pengaduan::get();
+        $tanggapan = Tanggapan::all();
+        return view('tanggapan.create', compact('pengaduan','tanggapan'));
     }
 
     /**
@@ -46,21 +45,32 @@ class TanggapanController extends Controller
             'id_pengaduan' => 'required',
             'tgl_tanggapan' => 'required',
             'tanggapan' => 'required',
-    		'nik' => 'required',
-
-
-    	]);
-
+            
+        ]);
+ 
         Tanggapan::create([
             'id_pengaduan' => $request->id_pengaduan,
             'tgl_tanggapan' => $request->tgl_tanggapan,
             'tanggapan' => $request->tanggapan,
-            'nik' => $request->nik,
+            'nik' => auth()->user()->nik,
+        ]);
+
+        $pengaduan = Pengaduan::find($request->id_pengaduan);
+        // dd($pengaduan);
+        $pengaduan->status = $request->status;
+        $pengaduan->save();
 
 
-    	]);
-
-    	return redirect('/tanggapan');
+        // $data_tanggapan = new Tanggapan();
+        // $data_tanggapan->tgl_tanggapan = request()->get('tgl_tanggapan');
+        // $data_tanggapan->id_pengaduan = request()->get('id_pengaduan');
+        // $data_tanggapan->tanggapan = request()->get('tanggapan');
+        // $data_tanggapan->nik = request()->get('nik');
+        // $data_tanggapan->id_tanggapan = Auth::user()->id_tanggapan;
+        // $data_tanggapan->save();
+        // return redirect()->back();
+ 
+        return redirect('/pengaduan')->with('toast_success','Tanggapan Berhasil Di Tambahkan');
     }
 
     /**
@@ -96,21 +106,21 @@ class TanggapanController extends Controller
     public function update(Request $request, $id_tanggapan)
     {
 
-        $this->validate($request,[
-            'id_pengaduan' => 'required',
-            'tgl_tanggapan' => 'required',
-    		'tanggapan' => 'required',
-            'nik' => 'required',
-         ]);
+        // $this->validate($request,[
+        //     'id_pengaduan' => 'required',
+        //     'tgl_tanggapan' => 'required',
+    	// 	'tanggapan' => 'required',
+        //     'nik' => 'required',
+        //  ]);
 
-         $tanggapan = Tanggapan::find('$id_tanggapan');
-         $tanggapan->id_pengaduan = $request->id_pengaduan;
-         $tanggapan->tgl_tanggapan = $request->tgl_tanggapan;
-         $tanggapan->tanggapan = $request->tanggapan;
-         $tanggapan->nik = $request->nik;
-         $tanggapan->save();
+        //  $tanggapan = Tanggapan::find('$id_tanggapan');
+        //  $tanggapan->id_pengaduan = $request->id_pengaduan;
+        //  $tanggapan->tgl_tanggapan = $request->tgl_tanggapan;
+        //  $tanggapan->tanggapan = $request->tanggapan;
+        //  $tanggapan->nik = $request->nik;
+        //  $tanggapan->save();
 
-         return redirect('tanggapan');
+        //  return redirect('tanggapan');
     }
 
     /**
@@ -121,10 +131,11 @@ class TanggapanController extends Controller
      */
     public function delete($id_tanggapan)
     {
-        Tanggapan::where('id_tanggapan','$id')->delete();
+        $tanggapan = Tanggapan::find($id_tanggapan);
+        $tanggapan->delete();
 
         Pengaduan::where('id_pengaduan','$id')->delete();
 
-        return redirect('tanggapan')->with('Data dihapus','Data berhasil dihapus');
+        return redirect('/tanggapan');
     }
 }
